@@ -2,9 +2,10 @@ import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { path: string[] } }
+  context: { params: Promise<{ path: string[] }> }
 ) {
-  const parts = params.path || [];
+  const { path } = await context.params;
+  const parts = path || [];
   let apiUrl = "";
 
   if (parts[0] === "friends" && parts[1]) {
