@@ -16,6 +16,8 @@ export async function GET(
     apiUrl = `https://friends.roblox.com/v1/users/${parts[1]}/followings/count`;
   } else if (parts[0] === "wearing" && parts[1]) {
     apiUrl = `https://avatar.roblox.com/v1/users/${parts[1]}/currently-wearing`;
+  } else if (parts[0] === "item" && parts[1]) {
+    apiUrl = `https://economy.roblox.com/v2/assets/${parts[1]}/details`;
   } else if (parts[0]) {
     apiUrl = `https://users.roblox.com/v1/users/${parts[0]}`;
   } else {
@@ -65,6 +67,18 @@ export async function GET(
       }));
 
       return NextResponse.json({ assets }, { headers });
+    }
+
+    if (parts[0] === "item" && parts[1]) {
+      return NextResponse.json(
+        {
+          Name: data.Name,
+          PriceRobux: data.PriceInRobux,
+          Creator: data.Creator?.Name || "Unknown",
+          IsForSale: data.IsForSale,
+        },
+        { headers }
+      );
     }
 
     return NextResponse.json(data, { headers });
