@@ -16,9 +16,6 @@ export async function GET(
     apiUrl = `https://friends.roblox.com/v1/users/${parts[1]}/followings/count`;
   } else if (parts[0] === "wearing" && parts[1]) {
     apiUrl = `https://avatar.roblox.com/v1/users/${parts[1]}/currently-wearing`;
-  } else if (parts[0] === "item" && parts[1]) {
-    // handled separately below (POST request, not a simple GET passthrough)
-    apiUrl = "ITEM_DETAILS";
   } else if (parts[0]) {
     apiUrl = `https://users.roblox.com/v1/users/${parts[0]}`;
   } else {
@@ -31,40 +28,6 @@ export async function GET(
   };
 
   try {
-    if (apiUrl === "ITEM_DETAILS") {
-      const assetId = Number(parts[1]);
-      const detailsRes = await fetch(
-        "https://catalog.roblox.com/v1/catalog/items/details",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Accept: "application/json",
-            "User-Agent": "Mozilla/5.0",
-          },
-          body: JSON.stringify({
-            items: [{ itemType: "Asset", id: assetId }],
-          }),
-        }
-      );
-      const detailsData = await detailsRes.json();
-      const item = detailsData?.data?.[0];
-
-      if (!item) {
-        return NextResponse.json({ error: "NotFound" }, { status: 404, headers });
-      }
-
-      return NextResponse.json(
-        {
-          Name: item.name,
-          PriceRobux: item.price ?? null,
-          Creator: item.creatorName || "Unknown",
-          IsForSale: !!item.price || item.isForSale === true,
-        },
-        { headers }
-      );
-    }
-
     const response = await fetch(apiUrl, {
       headers: {
         Accept: "application/json",
